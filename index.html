@@ -1,0 +1,4813 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>MaherXAI — MT5 Bridge</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+background:#111827;
+color:#e8eef5;
+font-family:Arial,sans-serif;
+padding-bottom:78px
+}
+
+.top{
+height:68px;
+padding:0 18px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+border-bottom:1px solid #263449;
+background:#151f2e;
+position:sticky;
+top:0;
+z-index:100
+}
+
+.brand{
+font-size:25px;
+font-weight:900;
+color:#d6aa4a
+}
+
+.brand span{color:#fff}
+
+.status{
+font-size:12px;
+color:#9fb2c8;
+display:flex;
+align-items:center;
+gap:7px
+}
+
+.dot{
+width:9px;
+height:9px;
+border-radius:50%;
+background:#ef4444;
+display:inline-block
+}
+
+.dot.online{
+background:#22c55e;
+box-shadow:0 0 8px #22c55e
+}
+
+.layout{
+display:block;
+min-height:calc(100vh - 68px);
+padding-bottom:78px
+}
+
+.main{
+padding:18px;
+max-width:1250px;
+width:100%;
+margin:auto
+}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:12px
+}
+
+.card,.panel{
+background:#182334;
+border:1px solid #29384c;
+border-radius:14px;
+padding:16px;
+box-shadow:0 8px 25px rgba(0,0,0,.18)
+}
+
+.label{
+font-size:12px;
+color:#71869e
+}
+
+.value{
+font-size:22px;
+font-weight:900;
+margin-top:8px
+}
+
+.green{color:#22c55e}
+.red{color:#ef4444}
+.gold{color:#d6aa4a}
+
+.grid{
+display:grid;
+grid-template-columns:1.4fr 1fr;
+gap:12px;
+margin-top:12px
+}
+
+.panel h2{
+margin:0 0 12px;
+font-size:16px
+}
+
+.chart{
+height:330px;
+background:#0f1724;
+border-radius:10px;
+position:relative;
+overflow:hidden;
+touch-action:none;
+cursor:grab
+}
+
+.chart:active{
+cursor:grabbing
+}
+
+.chart canvas{
+width:100%;
+height:100%
+}
+
+.tf{
+display:flex;
+gap:7px;
+margin:10px 0
+}
+
+.btn{
+border:1px solid #31445b;
+background:#1a293b;
+color:#cbd7e5;
+padding:8px 13px;
+border-radius:8px;
+cursor:pointer
+}
+
+.btn:hover{
+border-color:#d6aa4a
+}
+
+.btn.active{
+background:#263d58;
+border-color:#d6aa4a
+}
+
+.signal{
+display:flex;
+justify-content:space-between;
+align-items:center;
+font-size:28px;
+font-weight:900
+}
+
+.tag{
+font-size:12px;
+padding:7px 10px;
+border-radius:8px;
+background:#17263a
+}
+
+.confidencebar{
+height:10px;
+background:#101b2b;
+border-radius:99px;
+overflow:hidden;
+margin:8px 0
+}
+
+.confidencebar span{
+display:block;
+height:100%;
+width:0;
+background:#22c55e;
+transition:.25s
+}
+
+.rows .row,
+.history .row,
+.stats-list .row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:10px 0;
+border-bottom:1px solid #263449;
+font-size:13px
+}
+
+.row:last-child{border:0}
+
+.controls{
+display:flex;
+gap:8px;
+flex-wrap:wrap
+}
+
+.control{
+background:#17263a;
+border:1px solid #293b52;
+color:#fff;
+border-radius:9px;
+padding:10px
+}
+
+.control input{
+background:#0f1724;
+color:#fff;
+border:1px solid #31445b;
+border-radius:5px;
+padding:6px;
+width:90px;
+direction:ltr;
+text-align:left
+}
+
+.slider-wrap{
+width:100%;
+margin-top:12px;
+background:#17263a;
+border:1px solid #293b52;
+border-radius:10px;
+padding:12px
+}
+
+.slider-head{
+display:flex;
+justify-content:space-between;
+align-items:center;
+font-size:13px
+}
+
+.slider-value{
+font-weight:900;
+color:#d6aa4a;
+font-size:16px
+}
+
+input[type="range"]{
+width:100%;
+margin-top:12px;
+accent-color:#d6aa4a;
+cursor:pointer
+}
+
+.trade-list{
+max-height:440px;
+overflow:auto;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+gap:8px
+}
+
+.trade-card{
+background:#17263a;
+border:1px solid #293b52;
+border-radius:9px;
+padding:9px;
+margin:0;
+min-width:0
+}
+
+.trade-top{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:6px
+}
+
+.trade-side{
+font-size:13px;
+font-weight:900
+}
+
+.trade-ticket{
+font-size:9px;
+color:#71869e
+}
+
+.trade-grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:5px;
+margin-top:7px
+}
+
+.trade-info{
+background:#0f1724;
+border-radius:6px;
+padding:5px;
+font-size:9px;
+color:#8fa3bb;
+min-width:0
+}
+
+.trade-info b{
+display:block;
+font-size:11px;
+color:#fff;
+margin-top:2px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+direction:ltr;
+text-align:left
+}
+
+.trade-pnl{
+font-size:13px;
+font-weight:900
+}
+
+.trade-bottom{
+display:flex;
+justify-content:flex-end;
+align-items:center;
+gap:6px;
+margin-top:7px
+}
+
+.close-btn{
+border:1px solid #ef4444;
+background:#35141a;
+color:#fff;
+border-radius:6px;
+padding:5px 9px;
+cursor:pointer;
+font-size:10px
+}
+
+.close-btn:hover{background:#ef4444}
+
+.auto{
+margin-top:12px
+}
+
+.auto button{
+width:100%;
+padding:15px;
+border:0;
+border-radius:12px;
+background:#153a56;
+color:#fff;
+font-weight:900;
+font-size:16px;
+cursor:pointer
+}
+
+.auto button.on{
+background:#14532d
+}
+
+.notice{
+font-size:11px;
+color:#d9a441;
+line-height:1.55;
+margin-top:10px
+}
+
+.mini{
+font-size:11px;
+color:#8fa3bb
+}
+
+.metrics{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:8px
+}
+
+.metric{
+background:#17263a;
+padding:10px;
+border-radius:9px;
+text-align:center
+}
+
+.metric b{
+display:block;
+margin-top:4px
+}
+
+.quick-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+gap:10px;
+margin-bottom:12px
+}
+
+.quick{
+padding:12px;
+background:#182334;
+border:1px solid #29384c;
+border-radius:8px
+}
+
+.quick b{
+display:block;
+font-size:18px;
+margin-top:5px
+}
+
+.primary{
+background:#d6aa4a;
+color:#07111d;
+border:0;
+padding:10px 16px;
+border-radius:8px;
+font-weight:900;
+cursor:pointer
+}
+
+.danger{
+background:#35141a;
+color:#fff;
+border:1px solid #ef4444;
+padding:10px 16px;
+border-radius:8px;
+font-weight:900;
+cursor:pointer
+}
+
+.page{
+display:none;
+margin-top:14px
+}
+
+.page.active{
+display:block
+}
+
+.page-title{
+margin-bottom:12px
+}
+
+.page-title h1{
+margin:0 0 5px
+}
+
+.sub{
+font-size:12px;
+color:#8fa3bb
+}
+
+.connection{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:10px;
+margin-bottom:12px;
+padding:12px 14px;
+background:#182334;
+border:1px solid #29384c;
+border-radius:10px
+}
+
+.connection-state{
+font-weight:900
+}
+
+.mhx-ok{color:#22c55e}
+.mhx-bad{color:#ef4444}
+
+.sync-btn{
+background:#17283c;
+color:#fff;
+border:1px solid #31445b;
+padding:8px 14px;
+border-radius:7px;
+cursor:pointer
+}
+
+.bottom-nav{
+position:fixed;
+z-index:1000;
+bottom:0;
+left:0;
+right:0;
+height:72px;
+padding:7px 10px;
+background:rgba(15,24,39,.98);
+border-top:1px solid #29384c;
+display:flex;
+align-items:stretch;
+gap:6px;
+overflow-x:auto;
+box-shadow:0 -8px 25px rgba(0,0,0,.25)
+}
+
+.bottom-nav .nav{
+flex:0 0 auto;
+min-width:78px;
+height:58px;
+padding:5px 8px;
+border:1px solid transparent;
+background:transparent;
+color:#9fb2c8;
+border-radius:10px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+gap:3px;
+font-size:20px;
+cursor:pointer
+}
+
+.bottom-nav .nav span{
+font-size:10px;
+font-weight:700;
+color:#cbd7e5
+}
+
+.bottom-nav .nav.active,
+.bottom-nav .nav:hover{
+background:#1b2b40;
+border-color:#293b52;
+color:#d9a441
+}
+
+.bottom-nav .nav.active span{
+color:#d9a441
+}
+
+.footer{
+text-align:center;
+color:#71869e;
+font-size:11px;
+margin:18px
+}
+
+.toast{
+position:fixed;
+top:80px;
+left:50%;
+transform:translateX(-50%) translateY(-20px);
+background:#17283c;
+border:1px solid #31445b;
+color:#fff;
+padding:12px 18px;
+border-radius:10px;
+z-index:5000;
+opacity:0;
+pointer-events:none;
+transition:.25s;
+font-size:12px;
+box-shadow:0 10px 30px rgba(0,0,0,.35)
+}
+
+.toast.show{
+opacity:1;
+transform:translateX(-50%) translateY(0)
+}
+
+.toast.ok{border-color:#22c55e}
+.toast.bad{border-color:#ef4444}
+
+.stat-card{
+background:#17263a;
+border:1px solid #293b52;
+border-radius:10px;
+padding:12px;
+text-align:center
+}
+
+.stat-card .stat-title{
+font-size:11px;
+color:#8fa3bb
+}
+
+.stat-card .stat-value{
+font-size:20px;
+font-weight:900;
+margin-top:6px
+}
+
+.winrate{
+font-size:28px;
+font-weight:900;
+color:#d6aa4a
+}
+
+.analysis-box{
+margin-top:12px;
+padding:12px;
+border-radius:10px;
+background:#17263a;
+border:1px solid #293b52;
+line-height:1.7;
+font-size:12px
+}
+
+.risk-warning{
+margin-top:8px;
+padding:9px;
+border-radius:8px;
+background:#35141a;
+border:1px solid #7f1d1d;
+color:#fecaca;
+font-size:11px
+}
+
+.news-item{
+padding:9px;
+border-bottom:1px solid #263449;
+font-size:11px;
+line-height:1.5
+}
+
+.news-item:last-child{border-bottom:0}
+
+.news-high{
+color:#ef4444
+}
+
+.news-medium{
+color:#d6aa4a
+}
+
+.news-low{
+color:#22c55e
+}
+
+.chart-tools{
+display:flex;
+gap:6px;
+flex-wrap:wrap;
+margin-top:8px
+}
+
+.chart-tools .btn{
+padding:6px 10px;
+font-size:11px
+}
+
+@media(max-width:900px){
+
+.cards{
+grid-template-columns:repeat(2,1fr)
+}
+
+.grid{
+grid-template-columns:1fr
+}
+
+}
+
+@media(max-width:600px){
+
+.top{
+height:60px
+}
+
+.brand{
+font-size:21px
+}
+
+.main{
+padding:12px 10px
+}
+
+.cards{
+grid-template-columns:1fr 1fr
+}
+
+.metrics{
+grid-template-columns:1fr 1fr
+}
+
+.bottom-nav{
+height:68px;
+padding:5px 6px
+}
+
+.bottom-nav .nav{
+min-width:68px;
+height:56px
+}
+
+.layout{
+padding-bottom:74px
+}
+
+.trade-list{
+grid-template-columns:1fr 1fr
+}
+
+.trade-grid{
+grid-template-columns:repeat(3,1fr)
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<div id="toast" class="toast"></div>
+
+<header class="top">
+
+<div class="brand">
+MAHER <span>AI</span>
+</div>
+
+<div class="status">
+<span id="statusDot" class="dot"></span>
+<span id="mode">جاري الاتصال بـ MT5...</span>
+</div>
+
+</header>
+
+<div class="layout">
+
+<nav class="bottom-nav">
+
+<button class="nav active" data-page="home" onclick="nav('home')">
+⌂
+<span>الرئيسية</span>
+</button>
+
+<button class="nav" data-page="analysis" onclick="nav('analysis')">
+⌕
+<span>تحليل السوق</span>
+</button>
+
+<button class="nav" onclick="runAnalysis()">
+🤖
+<span>تحليل AI</span>
+</button>
+
+<button class="nav" onclick="toggleAuto()">
+⚡️
+<span>التداول الآلي</span>
+</button>
+
+<button class="nav" data-page="portfolio" onclick="nav('portfolio')">
+💼
+<span>المحفظة</span>
+</button>
+
+<button class="nav" data-page="history" onclick="nav('history')">
+📜
+<span>الصفقات</span>
+</button>
+
+<button class="nav" data-page="blacklist" onclick="nav('blacklist')">
+🚫
+<span>القائمة السوداء</span>
+</button>
+
+<button class="nav" onclick="connectRealBridge()">
+🔗
+<span>MT5 SYNC</span>
+</button>
+
+</nav>
+
+<main class="main">
+
+<div class="connection">
+
+<div>
+
+<div class="label">حالة MT5 Bridge</div>
+
+<div id="fxBridge" class="connection-state mhx-bad">
+جاري الاتصال...
+</div>
+
+<div id="realBridgeNotice" class="mini">
+جاري الفحص...
+</div>
+
+</div>
+
+<button class="sync-btn" onclick="connectRealBridge()">
+SYNC
+</button>
+
+</div>
+
+<section id="page-home" class="page active">
+
+<section class="cards">
+
+<div class="card">
+<div class="label">الرصيد MT5</div>
+<div id="fxBalance" class="value">$0.00</div>
+</div>
+
+<div class="card">
+<div class="label">Equity</div>
+<div id="fxEquity" class="value">$0.00</div>
+</div>
+
+<div class="card">
+<div class="label">Open P/L</div>
+<div id="fxOpenProfit" class="value">$0.00</div>
+</div>
+
+<div class="card">
+<div class="label">الصفقات المفتوحة</div>
+<div id="openCount" class="value">0</div>
+</div>
+
+</section>
+
+<div class="panel" style="margin-top:12px">
+
+<h2>📊 إحصائيات الصفقات</h2>
+
+<div class="quick-grid">
+
+<div class="stat-card">
+<div class="stat-title">إجمالي الصفقات</div>
+<div id="totalTrades" class="stat-value">0</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-title">الصفقات الرابحة</div>
+<div id="winningTrades" class="stat-value green">0</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-title">الصفقات الخاسرة</div>
+<div id="losingTrades" class="stat-value red">0</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-title">نسبة النجاح</div>
+<div id="winRate" class="winrate">0%</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-title">نسبة الخسارة</div>
+<div id="lossRate" class="stat-value">0%</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-title">مجموع الأرباح</div>
+<div id="totalProfit" class="stat-value">$0.00</div>
+</div>
+
+</div>
+</div>
+
+<div class="grid">
+
+<section class="panel">
+
+<h2>XAUUSD — الشارت الحقيقي</h2>
+
+<div class="chart" id="chartWrap">
+<canvas id="chart"></canvas>
+</div>
+
+<div class="chart-tools">
+
+<button class="btn" onclick="chartZoom(1.25)">＋ Zoom</button>
+<button class="btn" onclick="chartZoom(.8)">－ Zoom</button>
+<button class="btn" onclick="resetChartView()">↺ إعادة</button>
+<button class="btn" onclick="centerChart()">⌖ مركز</button>
+
+</div>
+
+<div class="tf">
+
+<button class="btn active" onclick="setTF('M1',this)">M1</button>
+<button class="btn" onclick="setTF('M5',this)">M5</button>
+<button class="btn" onclick="setTF('M15',this)">M15</button>
+
+</div>
+
+<div class="mini">
+اسحب الشارت للتحريك واستخدم أزرار Zoom للتكبير والتصغير.
+</div>
+
+</section>
+
+<section class="panel">
+
+<h2>قرار MaherXAI</h2>
+
+<div class="signal">
+
+<strong id="signal">WAIT</strong>
+
+<span id="confidenceTag" class="tag">
+الثقة —%
+</span>
+
+</div>
+
+<div class="confidencebar">
+<span id="confidenceBar"></span>
+</div>
+
+<div class="rows">
+
+<div class="row">
+<span>Entry</span>
+<strong id="entry">—</strong>
+</div>
+
+<div class="row">
+<span>Stop Loss</span>
+<strong id="sl">—</strong>
+</div>
+
+<div class="row">
+<span>Take Profit</span>
+<strong id="tp">—</strong>
+</div>
+
+<div class="row">
+<span>Risk / Reward</span>
+<strong id="rr">—</strong>
+</div>
+
+<div class="row">
+<span>توقع الاتجاه</span>
+<strong id="prediction">—</strong>
+</div>
+
+</div>
+
+<div id="reason" class="mini" style="margin-top:10px">
+جاهز للتحليل
+</div>
+
+</section>
+
+</div>
+
+<div class="grid">
+
+<section class="panel">
+
+<h2>مؤشرات التحليل</h2>
+
+<div class="metrics">
+
+<div class="metric">
+RSI
+<b id="rsi">—</b>
+</div>
+
+<div class="metric">
+EMA20/50
+<b id="ema">—</b>
+</div>
+
+<div class="metric">
+Momentum
+<b id="momentum">—</b>
+</div>
+
+<div class="metric">
+M5 Trend
+<b id="trend">—</b>
+</div>
+
+</div>
+
+<div class="analysis-box">
+
+<strong>🧠 تحليل متعدد الفريمات</strong>
+
+<div id="advancedAnalysis">
+بانتظار بيانات السوق...
+</div>
+
+</div>
+
+<div class="analysis-box">
+
+<strong>📰 الأخبار الاقتصادية</strong>
+
+<div id="newsStatus" class="mini">
+جاري فحص الأخبار...
+</div>
+
+<div id="newsBox">
+لا توجد بيانات أخبار حاليًا.
+</div>
+
+</div>
+
+<div class="notice">
+الثقة تقييم تحليلي وليست احتمال ربح مضمون.
+</div>
+
+</section>
+
+<section class="panel">
+
+<h2>إدارة التداول</h2>
+
+<div class="controls">
+
+<div class="control">
+LOT
+<input id="lotSize" type="number" value="0.01" min="0.01" max="100" step="0.01">
+</div>
+
+<div class="control">
+المخاطرة
+<input id="riskPct" type="number" value="1" min="0.1" max="5" step="0.1">
+%
+</div>
+
+<div class="control">
+أقصى صفقات
+<input id="maxTrades" type="number" value="3" min="1" max="10">
+</div>
+
+<div class="control">
+الحد الأقصى للخسارة
+<input id="maxLoss" type="number" value="50" min="1" max="100000" step="1">
+$
+</div>
+
+</div>
+
+<div class="slider-wrap">
+
+<div class="slider-head">
+
+<span>الحد الأدنى للثقة</span>
+
+<span id="minConfValue" class="slider-value">
+75%
+</span>
+
+</div>
+
+<input
+id="minConf"
+type="range"
+min="50"
+max="99"
+step="1"
+value="75"
+oninput="updateConfidenceSlider()"
+>
+
+<div class="mini">
+أقل نسبة ثقة مسموحة للتداول الآلي.
+</div>
+
+</div>
+<div class="panel" style="margin-top:12px">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+    <div>
+      <h3 style="margin:0">🚀 وضع الطفران</h3>
+      <div class="mini">
+        وضع خاص لرأس المال الصغير مع هدف إيقاف تلقائي.
+      </div>
+    </div>
+
+    <button
+      id="turboBtn"
+      class="auto"
+      onclick="toggleTurboMode()"
+      type="button"
+    >
+      🚀 تشغيل
+    </button>
+  </div>
+
+  <div style="margin-top:12px">
+    <label for="turboCapital">رأس المال المستهدف</label>
+
+    <input
+      id="turboCapital"
+      type="number"
+      min="30"
+      max="200"
+      step="1"
+      value="50"
+      inputmode="decimal"
+    >
+
+    <div class="mini">
+      المسموح من 30$ إلى 200$.
+    </div>
+  </div>
+
+  <div id="turboState" class="mini" style="margin-top:8px">
+    وضع الطفران متوقف
+  </div>
+
+</div>
+<div id="riskGuard" class="risk-warning" style="display:none">
+⛔ تم إيقاف التداول الآلي بسبب الوصول إلى الحد الأقصى للخسارة.
+</div>
+
+<div class="auto">
+
+<button id="autoBtn" onclick="toggleAuto()">
+⚡️ تشغيل التداول الآلي
+</button>
+
+</div>
+
+<div id="autoState" class="mini" style="margin-top:8px">
+التداول الآلي متوقف
+</div>
+
+</section>
+
+</div>
+
+<div class="grid">
+
+<section class="panel">
+
+<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">
+
+<h2 style="margin:0">الصفقات المفتوحة</h2>
+
+<button class="danger" onclick="closeAll()">
+إغلاق الكل
+</button>
+
+</div>
+
+<div id="trades" class="trade-list">
+
+<div class="row">
+<span>جاري مزامنة MT5...</span>
+<span>—</span>
+</div>
+
+</div>
+
+</section>
+
+<section class="panel">
+
+<h2>سجل إشارات AI</h2>
+
+<div id="history" class="history">
+
+<div class="row">
+<span>لا توجد إشارات بعد</span>
+<span>—</span>
+</div>
+
+</div>
+
+</section>
+
+</div>
+
+</section>
+
+<section id="page-analysis" class="page">
+
+<div class="page-title">
+
+<h1>تحليل السوق</h1>
+
+<div class="sub">
+تحليل متعدد الفريمات — M1 / M5 / M15 + الأخبار
+</div>
+
+</div>
+
+<section class="panel">
+
+<div class="quick-grid">
+
+<div class="quick">
+الاتجاه M15
+<b id="aiM15">—</b>
+</div>
+
+<div class="quick">
+الاتجاه M5
+<b id="aiM5">—</b>
+</div>
+
+<div class="quick">
+الاتجاه M1
+<b id="aiM1">—</b>
+</div>
+
+<div class="quick">
+RSI
+<b id="aiRsi">—</b>
+</div>
+
+<div class="quick">
+الإشارة
+<b id="aiSignal">—</b>
+</div>
+
+<div class="quick">
+الثقة
+<b id="aiConfidence">—</b>
+</div>
+
+</div>
+
+<button class="primary" onclick="runAnalysis()">
+🔎 تحديث تحليل AI
+</button>
+
+<div id="analysisDetails" class="analysis-box">
+بانتظار التحليل...
+</div>
+
+</section>
+
+</section>
+
+<section id="page-portfolio" class="page">
+
+<div class="page-title">
+
+<h1>المحفظة</h1>
+
+<div class="sub">
+بيانات حساب MT5 الحقيقية
+</div>
+
+</div>
+
+<section class="panel">
+
+<div class="quick-grid">
+
+<div class="quick">
+الرصيد
+<b id="pfBalance">$0.00</b>
+</div>
+
+<div class="quick">
+Equity
+<b id="pfEquity">$0.00</b>
+</div>
+
+<div class="quick">
+Free Margin
+<b id="pfMargin">$0.00</b>
+</div>
+
+<div class="quick">
+Open P/L
+<b id="pfProfit">$0.00</b>
+</div>
+
+<div class="quick">
+الصفقات المفتوحة
+<b id="pfOpen">0</b>
+</div>
+
+<div class="quick">
+مجموع الأرباح
+<b id="pfTotalProfit">$0.00</b>
+</div>
+
+</div>
+
+</section>
+
+</section>
+
+<section id="page-history" class="page">
+
+<div class="page-title">
+
+<h1>سجل الصفقات</h1>
+
+<div class="sub">
+الصفقات المغلقة وإحصائيات الأداء
+</div>
+
+</div>
+
+<section class="panel">
+
+<div class="quick-grid">
+
+<div class="quick">
+إجمالي الصفقات
+<b id="histTotal">0</b>
+</div>
+
+<div class="quick">
+رابحة
+<b id="histWins" class="green">0</b>
+</div>
+
+<div class="quick">
+خاسرة
+<b id="histLosses" class="red">0</b>
+</div>
+
+<div class="quick">
+نسبة النجاح
+<b id="histWinRate" class="gold">0%</b>
+</div>
+
+</div>
+
+<div id="fullHistory">
+لا يوجد سجل بعد
+</div>
+
+</section>
+
+</section>
+
+<section id="page-blacklist" class="page">
+
+<div class="page-title">
+
+<h1>🚫 القائمة السوداء</h1>
+
+<div class="sub">
+الرموز الموجودة هنا ممنوعة من التداول
+</div>
+
+</div>
+
+<section class="panel">
+
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+
+<input
+id="blSymbol"
+type="text"
+placeholder="XAUUSD"
+style="flex:1;min-width:180px;background:#0f1724;color:#fff;border:1px solid #31445b;padding:10px;border-radius:8px"
+>
+
+<button class="primary" onclick="addBlacklist()">
+إضافة
+</button>
+
+</div>
+
+<div id="blNotice" class="notice">
+القائمة السوداء تعمل كحاجز أمان.
+</div>
+
+<div id="blacklistRows"></div>
+
+</section>
+
+</section>
+
+<div class="footer">
+MaherXAI — MT5 Bridge
+</div>
+
+</main>
+</div>
+
+<script>
+
+const MT5_API='http://127.0.0.1:5000';
+const MT5_KEY='MaherXAI-2026';
+
+let tf='M1';
+let auto=false;
+let autoTimer=null;
+let turboMode=false;
+
+let price=0;
+let liveTick=null;
+let currentAI=null;
+
+let history=[];
+let trades=[];
+let closedTrades=[];
+let balance=0;
+
+let candlesByTF={
+M1:[],
+M5:[],
+M15:[]
+};
+
+let newsData=[];
+let newsImpact=0;
+let newsBlock=false;
+let lastTradeSignal='';
+let lastTradeTime=0;
+let dailyLossLocked=false;
+let sessionStartDate=new Date().toLocaleDateString('en-CA');
+
+const CONF_STORAGE='maherxai_confidence_v5';
+const LOT_STORAGE='maherxai_lot_v5';
+const RISK_STORAGE='maherxai_risk_v5';
+const MAX_TRADES_STORAGE='maherxai_max_trades_v5';
+const MAX_LOSS_STORAGE='maherxai_max_loss_v5';
+
+const $=id=>document.getElementById(id);
+
+const money=x=>'$'+Number(x||0).toFixed(2);
+
+function showToast(message,type='ok'){
+
+const toast=$('toast');
+
+if(!toast)return;
+
+toast.textContent=message;
+
+toast.className='toast show '+(type==='bad'?'bad':'ok');
+
+clearTimeout(showToast.timer);
+
+showToast.timer=setTimeout(
+()=>{
+toast.className='toast';
+},
+2800
+);
+
+}
+
+function nav(page){
+
+document.querySelectorAll('.page')
+.forEach(x=>x.classList.remove('active'));
+
+const target=$('page-'+page);
+
+if(target)
+target.classList.add('active');
+
+document.querySelectorAll('.bottom-nav .nav[data-page]')
+.forEach(
+x=>x.classList.toggle(
+'active',
+x.dataset.page===page
+)
+);
+
+if(page==='analysis')
+runAnalysis();
+
+}
+
+async function bridgeFetch(path,options={}){
+
+const headers={
+'X-API-Key':MT5_KEY,
+'Accept':'application/json',
+...(options.headers||{})
+};
+
+return fetch(
+MT5_API+path,
+{
+...options,
+headers,
+cache:'no-store'
+}
+);
+
+}
+
+async function checkBridge(){
+
+try{
+
+const response=await bridgeFetch('/api/status');
+
+if(!response.ok)
+throw new Error('HTTP '+response.status);
+
+const data=await response.json();
+
+if(!data.ok||!data.connected)
+throw new Error(data.error||'MT5 غير متصل');
+
+$('fxBridge').textContent='متصل';
+$('fxBridge').className='connection-state mhx-ok';
+
+$('realBridgeNotice').textContent=
+'متصل بنجاح مع MT5 — '+(data.server||'');
+
+$('statusDot').classList.add('online');
+
+$('mode').textContent=
+'MT5 متصل — '+(data.server||'');
+
+if(data.balance!=null){
+
+balance=Number(data.balance);
+
+$('fxBalance').textContent=money(balance);
+$('pfBalance').textContent=money(balance);
+
+}
+
+if(data.equity!=null){
+
+$('fxEquity').textContent=money(data.equity);
+$('pfEquity').textContent=money(data.equity);
+
+}
+
+if(data.free_margin!=null)
+$('pfMargin').textContent=money(data.free_margin);
+
+return true;
+
+}catch(error){
+
+$('fxBridge').textContent='غير متصل';
+$('fxBridge').className='connection-state mhx-bad';
+
+$('realBridgeNotice').textContent=
+'فشل الاتصال: '+error.message;
+
+$('statusDot').classList.remove('online');
+
+$('mode').textContent='MT5 غير متصل';
+
+return false;
+
+}
+
+}
+
+async function getLivePrice(){
+
+try{
+
+const response=await bridgeFetch('/api/xauusd');
+
+if(!response.ok)
+throw new Error('HTTP '+response.status);
+
+const data=await response.json();
+
+if(!data.ok||!data.connected)
+throw new Error(data.error||'MT5 غير متصل');
+
+const bid=Number(data.bid);
+const ask=Number(data.ask);
+
+if(!Number.isFinite(bid))
+throw new Error('السعر غير صالح');
+
+price=bid;
+
+liveTick={
+bid,
+ask,
+symbol:data.symbol,
+time:Number(data.time||Date.now()/1000)
+};
+
+return liveTick;
+
+}catch(error){
+
+console.error('Live price error:',error);
+
+return null;
+
+}
+
+}
+
+function normalizeCandle(c){
+
+if(!c)return null;
+
+const time=Number(c.time??c.timestamp??c.t??c[0]);
+const open=Number(c.open??c.o??c[1]);
+const high=Number(c.high??c.h??c[2]);
+const low=Number(c.low??c.l??c[3]);
+const close=Number(c.close??c.c??c[4]);
+const volume=Number(c.volume??c.tick_volume??c.v??c[5]??0);
+
+if(
+!Number.isFinite(time)||
+!Number.isFinite(open)||
+!Number.isFinite(high)||
+!Number.isFinite(low)||
+!Number.isFinite(close)
+)
+return null;
+
+return{time,open,high,low,close,volume};
+
+}
+
+async function fetchRealCandles(timeframe,count=180){
+
+try{
+const response=
+await bridgeFetch(
+'/api/candles?symbol=XAUUSD&timeframe='+
+encodeURIComponent(timeframe)+
+'&count='+count
+);
+
+if(!response.ok)
+throw new Error('HTTP '+response.status);
+
+const data=await response.json();
+
+const raw=
+Array.isArray(data.candles)?data.candles:
+Array.isArray(data.data)?data.data:
+Array.isArray(data.rates)?data.rates:
+Array.isArray(data.result)?data.result:[];
+
+const result=raw
+.map(normalizeCandle)
+.filter(Boolean)
+.sort((a,b)=>a.time-b.time);
+
+if(!result.length)
+throw new Error(data.error||'لم تصل شموع MT5');
+
+candlesByTF[timeframe]=result;
+
+return result;
+
+}catch(error){
+
+console.error('MT5 candles '+timeframe+':',error);
+
+if(
+Array.isArray(candlesByTF?.[timeframe])&&
+candlesByTF[timeframe].length
+)
+return candlesByTF[timeframe];
+
+return[];
+
+}
+
+}
+
+async function syncRealMarketData(){
+
+await Promise.all([
+fetchRealCandles('M1',150),
+fetchRealCandles('M5',100),
+fetchRealCandles('M15',80)
+]);
+
+const m1=candlesByTF.M1;
+
+if(m1.length)
+price=m1[m1.length-1].close;
+
+return(
+candlesByTF.M1.length>0||
+candlesByTF.M5.length>0||
+candlesByTF.M15.length>0
+);
+
+}
+
+async function syncPositions(){
+
+try{
+
+const response=await bridgeFetch('/api/positions');
+
+if(!response.ok)
+throw new Error('HTTP '+response.status);
+
+const data=await response.json();
+
+if(!data.ok)
+throw new Error(data.error||'تعذر جلب الصفقات');
+
+trades=Array.isArray(data.positions)?data.positions:[];
+
+renderTrades();
+
+return trades;
+
+}catch(error){
+
+console.error('Positions:',error);
+
+return null;
+
+}
+
+}
+
+async function syncClosedHistory(){
+
+try{
+
+const response=await bridgeFetch('/api/history');
+
+if(!response.ok){
+
+console.warn(
+'History HTTP error:',
+response.status
+);
+
+return null;
+
+}
+
+const data=await response.json();
+
+if(
+!data ||
+data.ok!==true ||
+!Array.isArray(data.history)
+){
+
+console.warn(
+'History data invalid:',
+data
+);
+
+return null;
+
+}
+
+/* =====================================================
+   حفظ الصفقات المغلقة القادمة من MT5
+===================================================== */
+
+closedTrades=data.history.map(t=>({
+
+ticket:Number(t.ticket||t.position||t.order||0),
+
+symbol:String(t.symbol||'XAUUSD'),
+
+side:String(t.side||''),
+
+volume:Number(t.volume||t.lot||0),
+
+price:Number(t.price||0),
+
+profit:Number(
+t.profit ??
+t.pnl ??
+t.P_L ??
+0
+),
+
+commission:Number(t.commission||0),
+
+swap:Number(t.swap||0),
+
+time:Number(t.time||0)
+
+}));
+
+/* =====================================================
+   تحديث الإحصائيات فوراً
+===================================================== */
+
+renderStatistics();
+
+/* =====================================================
+   تحديث سجل الصفقات
+===================================================== */
+
+if(typeof renderClosedHistory==='function'){
+
+renderClosedHistory();
+
+}
+
+return closedTrades;
+
+}catch(error){
+
+console.warn(
+'History endpoint unavailable:',
+error
+);
+
+return null;
+
+}
+
+}
+async function syncNews(){
+
+try{
+
+const response=await bridgeFetch('/api/news');
+
+if(!response.ok)
+throw new Error('NEWS_ENDPOINT_UNAVAILABLE');
+
+const data=await response.json();
+
+if(!data.ok&&data.ok!==undefined)
+throw new Error(data.error||'تعذر جلب الأخبار');
+
+newsData=
+Array.isArray(data.news)?data.news:
+Array.isArray(data.items)?data.items:
+Array.isArray(data.data)?data.data:[];
+
+newsImpact=0;
+newsBlock=false;
+
+const now=Date.now();
+
+newsData.forEach(n=>{
+
+const impact=
+String(
+n.impact||
+n.importance||
+n.level||
+''
+).toLowerCase();
+
+const timestamp=
+Number(
+n.timestamp||
+n.time||
+n.datetime||
+0
+);
+
+const currency=
+String(
+n.currency||
+n.ccy||
+''
+).toUpperCase();
+
+const relevant=
+currency==='USD'||
+currency==='XAU'||
+currency==='FED'||
+currency==='ALL'||
+currency==='';
+
+if(!relevant)
+return;
+
+let mins=Infinity;
+
+if(timestamp){
+
+const t=
+timestamp<10000000000
+?
+timestamp*1000
+:
+timestamp;
+
+mins=Math.abs(t-now)/60000;
+
+}
+
+if(
+impact.includes('high')||
+impact.includes('عالي')||
+impact.includes('قوي')
+){
+
+newsImpact+=
+mins<=90
+?
+25
+:
+mins<=240
+?
+12
+:
+0;
+
+if(mins<=30)
+newsBlock=true;
+
+}else if(
+impact.includes('medium')||
+impact.includes('متوسط')
+){
+
+newsImpact+=
+mins<=90
+?
+10
+:
+0;
+
+}
+
+});
+
+renderNews();
+
+return true;
+
+}catch(error){
+
+console.warn('News unavailable:',error);
+
+newsData=[];
+newsImpact=0;
+newsBlock=false;
+
+$('newsStatus').textContent=
+'مصدر الأخبار غير متاح من Bridge — لن يتم اختلاق أخبار.';
+
+$('newsBox').innerHTML=
+'<div class="mini">التحليل السعري يعمل، لكن تأثير الأخبار غير متوفر حاليًا.</div>';
+
+return false;
+
+}
+
+}
+
+function renderNews(){
+
+$('newsStatus').textContent=
+newsData.length
+?
+`تم تحميل ${newsData.length} خبر/بيان`
+:
+'لا توجد أخبار متاحة حاليًا.';
+
+if(!newsData.length){
+
+$('newsBox').innerHTML=
+'<div class="mini">لا توجد أخبار من مصدر الأخبار.</div>';
+
+return;
+
+}
+
+$('newsBox').innerHTML=
+newsData.slice(0,8).map(n=>{
+
+const impact=
+String(
+n.impact||
+n.importance||
+n.level||
+'LOW'
+).toLowerCase();
+
+const cls=
+impact.includes('high')||
+impact.includes('عالي')||
+impact.includes('قوي')
+?
+'news-high'
+:
+impact.includes('medium')||
+impact.includes('متوسط')
+?
+'news-medium'
+:
+'news-low';
+
+return`
+<div class="news-item ${cls}">
+<strong>${n.title||n.name||'خبر اقتصادي'}</strong>
+<br>
+${n.currency||''}
+${n.time||n.datetime||''}
+<br>
+${n.description||n.summary||''}
+</div>
+`;
+
+}).join('');
+
+}
+
+function closes(tfName){
+
+return(
+Array.isArray(candlesByTF[tfName])
+?
+candlesByTF[tfName]
+:
+[]
+)
+.map(c=>Number(c.close))
+.filter(Number.isFinite);
+
+}
+
+function ema(a,n){
+
+if(!Array.isArray(a)||!a.length)
+return 0;
+
+const k=2/(n+1);
+
+let e=Number(a[0])||0;
+
+for(let i=1;i<a.length;i++)
+e=Number(a[i])*k+e*(1-k);
+
+return e;
+
+}
+
+function rsi(a,n=14){
+
+if(!Array.isArray(a)||a.length<n+1)
+return 50;
+
+let gain=0;
+let loss=0;
+
+const start=Math.max(1,a.length-n);
+
+for(let i=start;i<a.length;i++){
+
+const d=Number(a[i])-Number(a[i-1]);
+
+if(d>0)gain+=d;
+else if(d<0)loss-=d;
+
+}
+
+if(loss===0)return 100;
+
+return 100-100/(1+gain/loss);
+
+}
+
+function atr(candles,n=14){
+
+if(!Array.isArray(candles)||candles.length<n+1)
+return 0;
+
+const tr=[];
+
+for(let i=1;i<candles.length;i++){
+
+const c=candles[i];
+const p=candles[i-1];
+
+tr.push(
+Math.max(
+c.high-c.low,
+Math.abs(c.high-p.close),
+Math.abs(c.low-p.close)
+)
+);
+
+}
+
+const recent=tr.slice(-n);
+
+return recent.reduce((a,b)=>a+b,0)/recent.length;
+
+}
+
+function trendFor(tfName){
+
+const data=closes(tfName);
+
+if(data.length<50)
+return 'WAIT';
+
+const e20=ema(data.slice(-100),20);
+const e50=ema(data.slice(-120),50);
+
+const last=data[data.length-1];
+
+if(e20>e50&&last>e20)
+return 'صاعد';
+
+if(e20<e50&&last<e20)
+return 'هابط';
+
+return 'محايد';
+
+}
+
+function candlePressure(tfName){
+
+const c=candlesByTF[tfName];
+
+if(!c||c.length<10)
+return 0;
+
+const recent=c.slice(-8);
+
+let score=0;
+
+recent.forEach(x=>{
+
+const range=x.high-x.low;
+
+if(range<=0)return;
+
+const body=Math.abs(x.close-x.open);
+
+const power=body/range;
+
+if(x.close>x.open)
+score+=power;
+else if(x.close<x.open)
+score-=power;
+
+});
+
+return score;
+
+}
+
+function volatilityState(){
+
+const c=candlesByTF.M1;
+
+if(!c||c.length<30)
+return 'UNKNOWN';
+
+const a=atr(c,14);
+const avgRange=
+c.slice(-30)
+.reduce(
+(s,x)=>s+(x.high-x.low),
+0
+)/30;
+
+if(!avgRange)
+return 'UNKNOWN';
+
+if(a>avgRange*1.8)
+return 'HIGH';
+
+if(a<avgRange*.55)
+return 'LOW';
+return 'NORMAL';
+
+}
+
+
+/* ============================
+   MAHER X AI MARKET ANALYSIS
+   ============================ */
+function analyzeNewsImpact(){
+
+let score=0;
+let reason='لا يوجد تأثير إخباري واضح';
+
+if(!Array.isArray(newsData)||newsData.length===0){
+return {
+score:0,
+reason
+};
+}
+
+const text=newsData
+.slice(0,5)
+.map(n=>(
+(n.title||'')+' '+(n.description||'')
+).toLowerCase())
+.join(' ');
+
+
+// أخبار تميل لقوة الدولار = ضغط محتمل على الذهب
+const bearishGold=[
+'rate hike',
+'raising rates',
+'higher rates',
+'interest rates',
+'hawkish',
+'strong dollar',
+'inflation rises',
+'fed increase'
+];
+
+
+// أخبار تميل لضعف الدولار = دعم محتمل للذهب
+const bullishGold=[
+'rate cut',
+'lower rates',
+'dovish',
+'weak dollar',
+'quantitative easing',
+'fed cut'
+];
+
+
+bearishGold.forEach(k=>{
+if(text.includes(k)){
+score-=2;
+}
+});
+
+
+bullishGold.forEach(k=>{
+if(text.includes(k)){
+score+=2;
+}
+});
+
+
+if(score>0)
+reason='الأخبار تميل لدعم الذهب';
+
+if(score<0)
+reason='الأخبار تميل للضغط على الذهب';
+
+
+return{
+score,
+reason
+};
+
+}
+
+function analyzeCandlePattern(tfName){
+
+const c = candlesByTF[tfName];
+
+if(!c || c.length < 5)
+return 0;
+
+const last = c[c.length-1];
+
+const body = Math.abs(last.close-last.open);
+
+const upperWick =
+last.high - Math.max(last.open,last.close);
+
+const lowerWick =
+Math.min(last.open,last.close) - last.low;
+
+const range =
+last.high-last.low;
+
+if(range<=0)
+return 0;
+
+let score=0;
+
+
+/* شمعة شراء قوية */
+if(
+last.close>last.open &&
+body/range>0.6
+)
+score+=1;
+
+
+/* شمعة بيع قوية */
+if(
+last.close<last.open &&
+body/range>0.6
+)
+score-=1;
+
+
+/* رفض هبوط - ذيل سفلي قوي */
+if(
+lowerWick>body*1.5
+)
+score+=1;
+
+
+/* رفض صعود - ذيل علوي قوي */
+if(
+upperWick>body*1.5
+)
+score-=1;
+
+
+/* آخر 3 شموع */
+const a=c.slice(-3);
+
+let bull=0;
+let bear=0;
+
+a.forEach(x=>{
+
+if(x.close>x.open)
+bull++;
+
+if(x.close<x.open)
+bear++;
+
+});
+
+
+if(bull===3)
+score+=1;
+
+if(bear===3)
+score-=1;
+
+
+return score;
+
+}
+
+function AI_Analysis(){
+
+const m1=closes('M1');
+const m5=closes('M5');
+const m15=closes('M15');
+
+/* الفريم المختار للتحليل */
+const selectedTF =
+tf==='M5'
+?
+'M5'
+:
+tf==='M15'
+?
+'M15'
+:
+'M1';
+
+const selectedCandles =
+selectedTF==='M5'
+?
+m5
+:
+selectedTF==='M15'
+?
+m15
+:
+m1;
+
+console.log(
+'AI TF:',selectedTF,
+'M1:',m1.length,
+'M5:',m5.length,
+'M15:',m15.length
+);
+
+/* كل فريم يحتاج شموعه فقط */
+if(selectedCandles.length<60){
+
+return{
+side:'WAIT',
+conf:50,
+p:price,
+
+m1Trend:selectedTF==='M1'?'WAIT':'—',
+m5Trend:selectedTF==='M5'?'WAIT':'—',
+m15Trend:selectedTF==='M15'?'WAIT':'—',
+
+r:50,
+mom:0,
+sl:null,
+tp:null,
+rr:'—',
+ready:false,
+
+prediction:'انتظار',
+
+reason:
+`بانتظار شموع كافية للفريم ${selectedTF}`
+};
+
+}
+
+const selected =
+selectedTF==='M5'
+?
+m5
+:
+selectedTF==='M15'
+?
+m15
+:
+m1;
+
+const selectedPrice=
+Number(price||selected[selected.length-1]);
+
+/* مؤشرات الفريم المختار فقط */
+
+const e20=
+ema(
+selected.slice(-100),
+20
+);
+
+const e50=
+ema(
+selected.slice(-120),
+50
+);
+
+const selectedRSI=
+rsi(
+selected,
+14
+);
+
+const p=selectedPrice;
+
+/* نحافظ على أسماء المتغيرات القديمة
+   حتى لا نخرب باقي منطق الذكاء */
+
+const m1e20=
+selectedTF==='M1'
+?
+e20
+:
+ema(m1.slice(-100),20);
+
+const m1e50=
+selectedTF==='M1'
+?
+e50
+:
+ema(m1.slice(-120),50);
+
+
+const m5e20=
+selectedTF==='M5'
+?
+e20
+:
+ema(m5.slice(-100),20);
+
+const m5e50=
+selectedTF==='M5'
+?
+e50
+:
+ema(m5.slice(-120),50);
+
+
+const m15e20=
+selectedTF==='M15'
+?
+e20
+:
+ema(m15.slice(-100),20);
+
+const m15e50=
+selectedTF==='M15'
+?
+e50
+:
+ema(m15.slice(-120),50);
+
+
+console.log(
+"EMA TEST",
+{
+m1e20,
+m1e50,
+m5e20,
+m5e50,
+m15e20,
+m15e50,
+price:p
+}
+);
+
+const m1r=
+selectedTF==='M1'
+?
+selectedRSI
+:
+rsi(m1,14);
+
+const selectedMomentum =
+selected[selected.length-1] -
+selected[Math.max(0,selected.length-10)];
+
+
+const selectedBull =
+e20>e50 &&
+p>=e20;
+
+
+const selectedPressure =
+candlePressure(selectedTF);
+
+
+const candleSignal =
+analyzeCandlePattern(selectedTF);
+
+
+let buy=0;
+let sell=0;
+
+let side='WAIT';
+let conf=50;
+
+
+/* أسماء المتغيرات القديمة للحفاظ على توافق باقي الكود */
+
+const m1Bull =
+selectedTF==='M1'
+?
+selectedBull
+:
+m1e20>m1e50&&p>=m1e20;
+
+
+const m5Bull =
+selectedTF==='M5'
+?
+selectedBull
+:
+m5e20>m5e50;
+
+
+const m15Bull =
+selectedTF==='M15'
+?
+selectedBull
+:
+m15e20>m15e50;
+
+
+const m1Pressure =
+selectedTF==='M1'
+?
+selectedPressure
+:
+candlePressure('M1');
+
+
+const m5Pressure =
+selectedTF==='M5'
+?
+selectedPressure
+:
+candlePressure('M5');
+
+
+
+/* الاتجاه — الفريم المختار + تأكيد الفريمات */
+
+if(selectedBull){
+
+    buy+=30;
+
+    if(m5Bull)
+        buy+=10;
+
+    if(m15Bull)
+        buy+=10;
+
+}else{
+
+    sell+=30;
+
+    if(!m5Bull)
+        sell+=10;
+
+    if(!m15Bull)
+        sell+=10;
+
+}
+
+
+
+/* RSI — للفريم المختار */
+
+if(selectedRSI>=52&&selectedRSI<=68)
+    buy+=20;
+
+if(selectedRSI<=48&&selectedRSI>=32)
+    sell+=20;
+
+if(selectedRSI>75)
+    sell+=10;
+
+if(selectedRSI<25)
+    buy+=10;
+
+
+
+/* Momentum */
+
+if(selectedMomentum>0)
+    buy+=15;
+
+if(selectedMomentum<0)
+    sell+=15;
+
+
+
+/* Candle Pattern */
+
+if(candleSignal>0)
+    buy+=Math.min(candleSignal*5,15);
+
+if(candleSignal<0)
+    sell+=Math.min(Math.abs(candleSignal)*5,15);
+
+
+
+/* ضغط الشموع */
+
+if(selectedPressure>1.0)
+    buy+=10;
+
+if(selectedPressure<-1.0)
+    sell+=10;
+
+
+
+const mom=selectedMomentum;
+
+
+
+if(buy>sell){
+
+    side='BUY';
+    conf=buy;
+
+}
+
+
+if(sell>buy){
+
+    side='SELL';
+    conf=sell;
+
+}
+
+
+if(buy===sell){
+
+    side='WAIT';
+    conf=50;
+
+}
+
+
+
+console.log(
+"BUY SCORE:",
+buy,
+"SELL SCORE:",
+sell,
+"SIDE:",
+side,
+"CONF:",
+conf
+);
+
+
+
+if(selectedTF==='M15'){
+    conf += 5;
+}
+
+if(selectedTF==='M5'){
+    conf += 2;
+}
+
+console.log(
+"CONF CHECK",
+"BUY/SELL:",
+side,
+"CONF:",
+conf,
+"RSI:",
+selectedRSI,
+"M15:",
+m15Bull,
+"M5:",
+m5Bull,
+"M1:",
+m1Bull
+);
+
+conf=Math.max(
+50,
+Math.min(conf,98)
+);
+
+const majorBull=m15Bull&&m5Bull;
+const majorBear =
+!m15Bull &&
+!m5Bull;
+
+if(
+side==='BUY' &&
+!majorBull
+){
+conf-=10;
+}
+
+if(
+side==='SELL' &&
+!majorBear
+){
+conf-=10;
+}
+
+console.log(
+"AI SCORE => BUY:",
+buy,
+"SELL:",
+sell,
+"SIDE:",
+side,
+"CONF:",
+conf
+);
+
+if(
+side==='BUY'&&
+m1Pressure<-.5
+)
+conf-=8;
+
+if(
+side==='SELL'&&
+m1Pressure>.5
+)
+conf-=8;
+
+/* تحليل الأخبار كمساعد فقط */
+
+const newsAnalysis = analyzeNewsImpact();
+console.log(
+"NEWS TEST",
+newsAnalysis.score,
+newsAnalysis.reason,
+"CONF BEFORE NEWS",
+conf
+);
+
+if(newsAnalysis.score < 0 && side==='SELL'){
+conf += Math.abs(newsAnalysis.score);
+}
+
+if(newsAnalysis.score > 0 && side==='BUY'){
+conf += Math.abs(newsAnalysis.score);
+}
+
+if(newsAnalysis.score < 0 && side==='BUY'){
+conf -= Math.abs(newsAnalysis.score);
+}
+
+if(newsAnalysis.score > 0 && side==='SELL'){
+conf -= Math.abs(newsAnalysis.score);
+}
+
+/* لا نوقف الصفقة بسبب الأخبار */
+newsBlock=false;
+
+const volatility=volatilityState();
+
+if(volatility==='HIGH')
+conf-=8;
+
+if(volatility==='LOW')
+conf-=4;
+
+conf=Math.max(
+50,
+Math.min(
+98,
+Math.round(conf)
+)
+);
+
+/* منع إشارة غير منطقية */
+
+const agreement =
+(
+(m15Bull?1:-1)+
+(m5Bull?1:-1)+
+(m1Bull?1:-1)
+);
+
+if(
+side==='BUY' &&
+agreement < 1
+)
+conf=Math.min(conf,70);
+
+if(
+side==='SELL' &&
+agreement > 1
+){
+    conf=Math.min(conf,70);
+}
+
+if(
+conf<Number($('minConf')?.value||60)
+)
+
+side='WAIT';
+
+const readyTrade =
+side!=='WAIT' && conf>=Number($('minConf')?.value||60);
+
+/* =========================
+   SMART SL / TP XAUUSD
+========================= */
+
+const atrValue =
+atr(candlesByTF.M1,14);
+
+
+const safeATR =
+Number.isFinite(atrValue)&&atrValue>0
+?
+atrValue
+:
+2.5;
+
+
+/* وقف خسارة ذكي للذهب */
+
+const riskDistance =
+Math.max(
+safeATR * 2.0,
+1.8
+);
+
+
+/* الهدف حسب قوة الثقة */
+
+let rewardMultiplier = 2.2;
+
+
+if(conf>=85)
+    rewardMultiplier = 3.2;
+
+else if(conf>=75)
+    rewardMultiplier = 2.7;
+
+
+const rewardDistance =
+riskDistance * rewardMultiplier;
+
+
+/* نسبة العائد للمخاطرة */
+
+const smartRR =
+(rewardDistance/riskDistance).toFixed(2);
+
+return{
+
+side,
+conf,
+p,
+
+m1Trend:
+m1Bull
+?
+'صاعد'
+:
+'هابط',
+
+m5Trend:
+m5Bull
+?
+'صاعد'
+:
+'هابط',
+
+m15Trend:
+m15Bull
+?
+'صاعد'
+:
+'هابط',
+
+r:m1r,
+mom,
+volatility,
+
+sl:
+side==='BUY'
+?
+p-riskDistance
+:
+side==='SELL'
+?
+p+riskDistance
+:
+null,
+
+tp:
+side==='BUY'
+?
+p+rewardDistance
+:
+side==='SELL'
+?
+p-rewardDistance
+:
+null,
+
+rr:
+side==='WAIT'
+?
+'—'
+:
+smartRR,
+
+prediction:
+side==='BUY'
+?
+'صعود محتمل'
+:
+side==='SELL'
+?
+'هبوط محتمل'
+:
+'انتظار',
+
+ready:readyTrade,
+
+reason:
+`${m15Bull?'M15 صاعد':'M15 هابط'} + `+
+`${m5Bull?'M5 صاعد':'M5 هابط'} + `+
+`${m1Bull?'M1 صاعد':'M1 هابط'} | `+
+`RSI ${m1r.toFixed(1)} | `+
+`Volatility ${volatility}`
+
+};
+
+}
+
+function render(d){
+
+if(!d)return;
+
+$('signal').textContent=d.side;
+
+$('signal').className=
+d.side==='BUY'
+?
+'green'
+:
+d.side==='SELL'
+?
+'red'
+:
+'';
+
+$('confidenceTag').textContent=
+'الثقة '+d.conf+'%';
+
+$('confidenceBar').style.width=
+Math.max(0,Math.min(100,d.conf))+'%';
+
+$('aiConfidence').textContent=d.conf+'%';
+
+$('entry').textContent=
+Number.isFinite(d.p)
+?
+d.p.toFixed(2)
+:
+'—';
+
+$('sl').textContent=
+d.sl!==null
+?
+d.sl.toFixed(2)
+:
+'—';
+
+$('tp').textContent=
+d.tp!==null
+?
+d.tp.toFixed(2)
+:
+'—';
+
+$('rr').textContent=d.rr;
+
+$('prediction').textContent=d.prediction;
+
+$('rsi').textContent=
+Number(d.r).toFixed(1);
+
+$('ema').textContent=d.m1Trend;
+
+$('momentum').textContent=
+d.mom>0
+?
+'إيجابي'
+:
+d.mom<0
+?
+'سلبي'
+:
+'محايد';
+
+$('trend').textContent=d.m5Trend;
+
+$('aiM1').textContent=d.m1Trend;
+$('aiM5').textContent=d.m5Trend;
+$('aiM15').textContent=d.m15Trend;
+
+$('aiRsi').textContent=
+Number(d.r).toFixed(1);
+
+$('aiSignal').textContent=d.side;
+
+
+$('advancedAnalysis').innerHTML=`
+M15: ${d.m15Trend}
+<br>
+M5: ${d.m5Trend}
+<br>
+M1: ${d.m1Trend}
+<br>
+RSI: ${Number(d.r).toFixed(1)}
+<br>
+Momentum:
+${d.mom>0?'إيجابي':d.mom<0?'سلبي':'محايد'}
+<br>
+Volatility: ${d.volatility||'—'}
+<br>
+News impact: ${newsImpact}
+<br>
+News AI:
+${analyzeNewsImpact().reason}
+<br>
+News Score:
+${analyzeNewsImpact().score}
+<br>
+${newsBlock?'⚠️ خبر قوي قريب — انتظار':'لا يوجد حظر أخبار نشط'}
+`;
+$('analysisDetails').innerHTML=`
+
+<strong>النتيجة:</strong> ${d.side}
+<br>
+<strong>الثقة:</strong> ${d.conf}%
+<br>
+<strong>التوقع:</strong> ${d.prediction}
+<br>
+<strong>M15:</strong> ${d.m15Trend}
+<br>
+<strong>M5:</strong> ${d.m5Trend}
+<br>
+<strong>M1:</strong> ${d.m1Trend}
+<br>
+<strong>RSI:</strong> ${Number(d.r).toFixed(1)}
+<br>
+<strong>Momentum:</strong>
+${d.mom>0?'إيجابي':d.mom<0?'سلبي':'محايد'}
+<br>
+<strong>التقلب:</strong> ${d.volatility||'—'}
+<br>
+<strong>الأخبار:</strong>
+${newsBlock?'خبر مؤثر قريب — WAIT':'لا يوجد حظر أخبار'}
+`;
+
+$('reason').textContent=
+d.side==='WAIT'
+?
+(
+newsBlock
+?
+'خبر اقتصادي مؤثر قريب — النظام ينتظر حتى تهدأ الحركة.'
+:
+d.conf<Number($('minConf')?.value||75)
+?
+`الثقة ${d.conf}% أقل من الحد ${$('minConf')?.value||75}%.`
+:
+'لا يوجد توافق قوي كافٍ للدخول.'
+)
+:
+d.reason+` | الثقة ${d.conf}%`;
+
+}
+
+function addHistory(d){
+
+if(!d||d.side==='WAIT')
+return;
+
+history.unshift({
+
+time:new Date().toLocaleTimeString(
+'ar',
+{
+hour:'2-digit',
+minute:'2-digit'
+}
+),
+
+side:d.side,
+conf:d.conf,
+p:d.p,
+tf,
+sl:d.sl,
+tp:d.tp
+
+});
+
+history=history.slice(0,30);
+
+$('history').innerHTML=
+history.map(
+x=>`
+<div class="row">
+
+<span>
+XAUUSD · ${x.side} · ${x.tf}
+</span>
+
+<span class="label">
+${x.conf}% · SL ${Number(x.sl||0).toFixed(2)} · TP ${Number(x.tp||0).toFixed(2)}
+</span>
+
+</div>
+`
+).join('');
+
+$('fullHistory').innerHTML=
+history.length
+?
+history.map(
+x=>`
+<div class="row">
+
+<span>
+XAUUSD · ${x.side} · ${x.tf}
+</span>
+
+<span>
+${Number(x.p).toFixed(2)} |
+SL ${Number(x.sl||0).toFixed(2)} |
+TP ${Number(x.tp||0).toFixed(2)}
+</span>
+
+</div>
+`
+).join('')
+:
+'لا يوجد سجل بعد';
+
+}
+
+async function runAnalysis(){
+
+if(runAnalysis.busy)
+return;
+
+runAnalysis.busy=true;
+
+try{
+
+await getLivePrice();
+await syncRealMarketData();
+await syncNews();
+
+const d=AI_Analysis();
+
+currentAI=d;
+
+console.log("AI OBJECT:", d);
+console.log("CURRENT AI:", currentAI);
+
+render(d);
+
+requestAnimationFrame(drawChart);
+
+if(
+auto&&
+d.ready&&
+d.side!=='WAIT'
+){
+
+await openTrade(d);
+
+}
+
+}catch(error){
+
+console.error('Analysis error:',error);
+
+}finally{
+
+runAnalysis.busy=false;
+
+}
+
+}
+async function livePriceLoop(){
+
+try{
+
+const tick = await getLivePrice();
+
+if(tick){
+
+const priceEl=$('price');
+
+if(priceEl){
+priceEl.textContent=tick.bid.toFixed(2);
+}
+
+}
+
+}catch(e){
+
+console.error('Price loop:',e);
+
+}
+
+}
+
+setInterval(
+livePriceLoop,
+1000
+);
+
+async function sendMT5Trade(side,sl,tp,lot){
+
+if(isBlacklisted('XAUUSD')){
+
+showToast(
+'XAUUSD موجود في القائمة السوداء',
+'bad'
+);
+
+return null;
+
+}
+
+try{
+
+const response=
+await bridgeFetch(
+'/api/trade',
+{
+
+method:'POST',
+
+headers:{
+'Content-Type':'application/json'
+},
+
+body:JSON.stringify({
+
+side,
+sl:Number(sl),
+tp:Number(tp),
+volume:Number(lot),
+lot:Number(lot)
+
+})
+
+}
+);
+
+const data=
+await response.json().catch(()=>({}));
+
+if(!response.ok){
+
+throw new Error(
+data.message||
+data.error||
+'HTTP '+response.status
+);
+
+}
+
+if(data.ok===false){
+
+throw new Error(
+data.message||
+data.error||
+'رفض MT5 الأمر'
+);
+
+}
+
+return data;
+
+}catch(error){
+
+showToast(
+'تعذر إرسال الصفقة: '+error.message,
+'bad'
+);
+
+return null;
+
+}
+
+}
+
+function getDailyLoss(){
+
+const today=new Date().toLocaleDateString('en-CA');
+
+if(today!==sessionStartDate){
+
+sessionStartDate=today;
+dailyLossLocked=false;
+
+}
+
+let loss=0;
+
+if(Array.isArray(closedTrades)){
+
+closedTrades.forEach(t=>{
+
+const p=Number(
+t.profit??
+t.pnl??
+t.P_L??
+0
+);
+
+const date=
+t.date||
+t.time||
+t.close_time||
+t.closed_at||
+'';
+
+if(!date){
+
+if(p<0)
+loss+=Math.abs(p);
+
+return;
+
+}
+
+const parsed=new Date(date);
+
+if(
+Number.isFinite(parsed.getTime())&&
+parsed.toLocaleDateString('en-CA')===today&&
+p<0
+){
+
+loss+=Math.abs(p);
+
+}
+
+});
+
+}
+
+return loss;
+
+}
+
+function checkDailyLossLimit(){
+
+const limit=
+Number($('maxLoss')?.value||50);
+
+const loss=getDailyLoss();
+
+if(loss>=limit){
+
+dailyLossLocked=true;
+
+$('riskGuard').style.display='block';
+
+$('autoState').textContent=
+`⛔ حد الخسارة اليومي وصل إلى ${money(loss)} من ${money(limit)}.`;
+
+if(auto){
+
+auto=false;
+
+clearInterval(autoTimer);
+autoTimer=null;
+
+$('autoBtn').classList.remove('on');
+
+$('autoBtn').textContent=
+'⚡️ تشغيل التداول الآلي';
+
+showToast(
+'تم إيقاف التداول الآلي بسبب حد الخسارة',
+'bad'
+);
+
+}
+
+return true;
+
+}
+
+$('riskGuard').style.display='none';
+
+return false;
+
+}
+
+async function openTrade(d){
+
+if(
+!d||
+!d.ready||
+(d.side!=='BUY'&&d.side!=='SELL')
+)
+return;
+
+if(checkDailyLossLimit())
+return;
+
+const max=
+Number($('maxTrades')?.value||3);
+
+await syncPositions();
+
+if(trades.length>=max){
+
+$('autoState').textContent=
+'تم الوصول إلى الحد الأقصى للصفقات.';
+
+return;
+
+}
+
+const minConfidence=
+Number($('minConf')?.value||75);
+
+if(d.conf<minConfidence){
+
+$('autoState').textContent=
+`الثقة ${d.conf}% أقل من الحد المطلوب ${minConfidence}%.`;
+
+return;
+
+}
+
+if(newsBlock){
+
+$('autoState').textContent=
+'⛔ خبر اقتصادي مؤثر قريب — لا دخول.';
+
+return;
+
+}
+
+/* منع التكرار */
+
+const now=Date.now();
+
+if(
+d.side===lastTradeSignal&&
+now-lastTradeTime<60000
+){
+
+return;
+
+}
+
+const entry=Number(price);
+
+const sl=
+Number.isFinite(d.sl)
+?
+d.sl
+:
+d.side==='BUY'
+?
+entry-3
+:
+entry+3;
+
+const tp=
+Number.isFinite(d.tp)
+?
+d.tp
+:
+d.side==='BUY'
+?
+entry+6
+:
+entry-6;
+
+const lot=
+Number($('lotSize')?.value||0.01);
+
+if(!Number.isFinite(lot)||lot<=0){
+
+showToast(
+'قيمة LOT غير صحيحة',
+'bad'
+);
+
+return;
+
+}
+
+const result=
+await sendMT5Trade(
+d.side,
+sl,
+tp,
+lot
+);
+
+if(!result)
+return;
+
+lastTradeSignal=d.side;
+lastTradeTime=now;
+
+const ticket=
+result.ticket??
+result.order??
+result.position??
+Date.now();
+
+addHistory(d);
+
+$('autoState').textContent=
+`تم إرسال ${d.side} — LOT ${lot} — SL ${sl.toFixed(2)} — TP ${tp.toFixed(2)} — Ticket ${ticket}`;
+
+showToast(
+`تم فتح ${d.side} — SL ${sl.toFixed(2)} — TP ${tp.toFixed(2)}`
+);
+
+await syncPositions();
+
+drawChart();
+
+}
+
+async function manualTrade(side){
+
+const d=AI_Analysis();
+
+d.side=side;
+
+if(side==='BUY'&&d.m15Trend==='هابط'&&d.m5Trend==='هابط'){
+
+showToast(
+'تنبيه: الاتجاه الرئيسي هابط — الشراء يدويًا ضد الاتجاه.',
+'bad'
+);
+
+}
+
+if(side==='SELL'&&d.m15Trend==='صاعد'&&d.m5Trend==='صاعد'){
+
+showToast(
+'تنبيه: الاتجاه الرئيسي صاعد — البيع يدويًا ضد الاتجاه.',
+'bad'
+);
+
+}
+
+await openTrade(d);
+
+}
+
+async function closePosition(ticket){
+
+try{
+
+const response=
+await bridgeFetch(
+'/api/close',
+{
+
+method:'POST',
+
+headers:{
+'Content-Type':'application/json'
+},
+
+body:JSON.stringify({
+ticket:Number(ticket)
+})
+
+}
+);
+
+const data=
+await response.json().catch(()=>({}));
+
+if(!response.ok){
+
+throw new Error(
+data.message||
+data.error||
+'HTTP '+response.status
+);
+
+}
+
+if(data.ok===false){
+
+throw new Error(
+data.message||
+data.error||
+'رفض MT5 إغلاق الصفقة'
+);
+
+}
+
+showToast(
+`تم إرسال أمر إغلاق الصفقة ${ticket}`
+);
+
+await syncPositions();
+await syncClosedHistory();
+await checkBridge();
+
+drawChart();
+
+return data;
+
+}catch(error){
+
+showToast(
+`تعذر إغلاق الصفقة ${ticket}: ${error.message}`,
+'bad'
+);
+
+return null;
+
+}
+
+}
+
+async function closeAllMT5(){
+
+try{
+
+const response=
+await bridgeFetch(
+'/api/close-all',
+{
+method:'POST'
+}
+);
+
+const data=
+await response.json().catch(()=>({}));
+
+if(!response.ok){
+
+throw new Error(
+data.message||
+data.error||
+'HTTP '+response.status
+);
+
+}
+
+if(data.ok===false){
+
+throw new Error(
+data.message||
+data.error||
+'رفض MT5 إغلاق الصفقات'
+);
+
+}
+
+return data;
+
+}catch(error){
+
+showToast(
+'تعذر إغلاق الصفقات: '+error.message,
+'bad'
+);
+
+return null;
+
+}
+
+}
+
+async function closeAll(){
+
+if(!trades.length){
+
+showToast('لا توجد صفقات مفتوحة');
+
+return;
+
+}
+
+const data=await closeAllMT5();
+
+if(data){
+
+trades=[];
+
+renderTrades();
+
+await syncClosedHistory();
+await checkBridge();
+
+drawChart();
+
+showToast('تم إرسال إغلاق جميع الصفقات');
+
+}
+
+}
+
+function renderTrades(){
+
+const count=trades.length;
+
+$('openCount').textContent=count;
+$('pfOpen').textContent=count;
+
+const totalProfit=
+trades.reduce(
+(sum,t)=>sum+Number(t.profit||0),
+0
+);
+
+$('fxOpenProfit').textContent=
+money(totalProfit);
+
+$('fxOpenProfit').className=
+'value '+(
+totalProfit>0
+?
+'green'
+:
+totalProfit<0
+?
+'red'
+:
+''
+);
+
+$('pfProfit').textContent=
+money(totalProfit);
+
+if(!count){
+
+$('trades').innerHTML=
+`
+<div class="row" style="grid-column:1/-1">
+<span>لا توجد صفقات مفتوحة في MT5</span>
+<span>—</span>
+</div>
+`;
+
+return;
+
+}
+
+$('trades').innerHTML=
+trades.map(t=>{
+
+const pnl=Number(t.profit||0);
+
+return`
+
+<div class="trade-card">
+
+<div class="trade-top">
+
+<div class="trade-side ${
+t.side==='BUY'?'green':'red'
+}">
+${t.symbol||'XAUUSD'} · ${t.side}
+</div>
+
+<div class="trade-ticket">
+#${t.ticket}
+</div>
+
+</div>
+
+<div class="trade-grid">
+
+<div class="trade-info">
+LOT
+<b>${Number(t.volume||t.lot||0).toFixed(2)}</b>
+</div>
+
+<div class="trade-info">
+Entry
+<b>${Number(t.entry||0).toFixed(2)}</b>
+</div>
+
+<div class="trade-info">
+Price
+<b>${Number(t.price||0).toFixed(2)}</b>
+</div>
+
+<div class="trade-info">
+SL
+<b>${Number(t.sl||0).toFixed(2)}</b>
+</div>
+
+<div class="trade-info">
+TP
+<b>${Number(t.tp||0).toFixed(2)}</b>
+</div>
+
+<div class="trade-info">
+P/L
+<b class="trade-pnl ${
+pnl>0?'green':pnl<0?'red':''
+}">
+${money(pnl)}
+</b>
+</div>
+
+</div>
+
+<div class="trade-bottom">
+
+<button
+class="close-btn"
+onclick="closePosition(${Number(t.ticket)})">
+إغلاق
+</button>
+
+</div>
+
+</div>
+
+`;
+
+}).join('');
+
+}
+
+function renderStatistics(){
+
+if(!Array.isArray(closedTrades))
+return;
+
+const normalized=
+closedTrades.map(t=>({
+
+profit:Number(
+t.profit??
+t.pnl??
+t.P_L??
+0
+)
+
+}));
+
+const total=normalized.length;
+
+const wins=
+normalized.filter(t=>t.profit>0).length;
+
+const losses=
+normalized.filter(t=>t.profit<0).length;
+
+const totalProfit=
+normalized.reduce(
+(sum,t)=>sum+t.profit,
+0
+);
+
+const winRate=
+total?(wins/total)*100:0;
+
+const lossRate=
+total?(losses/total)*100:0;
+
+$('totalTrades').textContent=total;
+$('winningTrades').textContent=wins;
+$('losingTrades').textContent=losses;
+
+$('winRate').textContent=
+winRate.toFixed(1)+'%';
+
+$('lossRate').textContent=
+lossRate.toFixed(1)+'%';
+
+$('totalProfit').textContent=
+money(totalProfit);
+
+$('totalProfit').className=
+'stat-value '+(
+totalProfit>0
+?
+'green'
+:
+totalProfit<0
+?
+'red'
+:
+''
+);
+
+$('pfTotalProfit').textContent=
+money(totalProfit);
+
+$('histTotal').textContent=total;
+$('histWins').textContent=wins;
+$('histLosses').textContent=losses;
+
+$('histWinRate').textContent=
+winRate.toFixed(1)+'%';
+
+}
+
+function toggleAuto(){
+
+if(!auto&&checkDailyLossLimit()){
+
+showToast(
+'لا يمكن تشغيل البوت: حد الخسارة اليومي مستهلك',
+'bad'
+);
+
+return;
+
+}
+
+auto=!auto;
+
+const button=$('autoBtn');
+
+if(auto){
+
+button.classList.add('on');
+
+button.textContent=
+'🟢 التداول الآلي يعمل — إيقاف';
+
+$('autoState').textContent=
+'AI يراقب السوق والأسعار والأخبار باستمرار.';
+
+runAnalysis();
+
+clearInterval(autoTimer);
+
+autoTimer=
+setInterval(
+runAnalysis,
+5000
+);
+
+}else{
+
+button.classList.remove('on');
+
+button.textContent=
+'⚡️ تشغيل التداول الآلي';
+
+$('autoState').textContent=
+'التداول الآلي متوقف';
+
+clearInterval(autoTimer);
+
+autoTimer=null;
+
+}
+
+}
+function toggleTurboMode(){
+
+const btn=$('turboBtn');
+const state=$('turboState');
+const input=$('turboCapital');
+
+if(!btn||!state||!input)return;
+
+const value=Number(input.value);
+
+if(!turboMode){
+
+if(!Number.isFinite(value)||value<30||value>200){
+
+showToast(
+'ضع مبلغًا بين 30$ و200$',
+'bad'
+);
+
+return;
+
+}
+
+turboMode=true;
+
+btn.classList.add('on');
+btn.textContent='🟢 مفعّل — إيقاف';
+
+state.textContent=
+`🚀 وضع الطفران مفعّل — رأس المال: $${value}`;
+
+}else{
+
+turboMode=false;
+
+btn.classList.remove('on');
+btn.textContent='🚀 تشغيل';
+
+state.textContent=
+'وضع الطفران متوقف';
+
+}
+
+}
+function updateConfidenceSlider(){
+
+const value=Number($('minConf').value);
+
+$('minConfValue').textContent=value+'%';
+
+localStorage.setItem(
+CONF_STORAGE,
+String(value)
+);
+
+}
+
+function setTF(x,button){
+
+tf=x;
+
+document.querySelectorAll('.tf .btn')
+.forEach(b=>b.classList.remove('active'));
+
+if(button)
+button.classList.add('active');
+
+runAnalysis();
+drawChart();
+
+}
+
+let mhxBlacklist=[];
+
+try{
+
+const savedBlacklist=
+localStorage.getItem('maherxai_blacklist');
+
+mhxBlacklist=
+savedBlacklist
+?
+JSON.parse(savedBlacklist)
+:
+[];
+
+if(!Array.isArray(mhxBlacklist))
+mhxBlacklist=[];
+
+}catch(error){
+
+mhxBlacklist=[];
+
+}
+
+function addBlacklist(){
+
+const input=$('blSymbol');
+
+const symbol=
+(input?.value||'')
+.trim()
+.toUpperCase();
+
+if(!symbol)
+return;
+
+if(!mhxBlacklist.includes(symbol))
+mhxBlacklist.push(symbol);
+
+localStorage.setItem(
+'maherxai_blacklist',
+JSON.stringify(mhxBlacklist)
+);
+
+input.value='';
+
+$('blNotice').textContent=
+`تمت إضافة ${symbol} للقائمة السوداء.`;
+
+renderBlacklist();
+
+}
+
+function removeBlacklist(index){
+
+mhxBlacklist.splice(index,1);
+
+localStorage.setItem(
+'maherxai_blacklist',
+JSON.stringify(mhxBlacklist)
+);
+
+renderBlacklist();
+
+}
+
+function isBlacklisted(symbol){
+
+return mhxBlacklist.includes(
+String(symbol).toUpperCase()
+);
+
+}
+
+function renderBlacklist(){
+
+const el=$('blacklistRows');
+
+if(!el)return;
+
+el.innerHTML=
+mhxBlacklist.length
+?
+mhxBlacklist.map(
+(x,i)=>
+`
+<div class="row">
+
+<span>
+🚫 ${x}
+</span>
+
+<button
+class="btn"
+onclick="removeBlacklist(${i})">
+حذف
+</button>
+
+</div>
+`
+).join('')
+:
+`
+<div class="row">
+
+<span>القائمة فارغة</span>
+
+<span class="label">مسموح</span>
+
+</div>
+`;
+
+}
+
+/* =========================
+CHART
+========================= */
+
+let chartScale=1;
+let chartOffset=0;
+let chartDragging=false;
+let chartDragStartX=0;
+let chartStartOffset=0;
+
+function resetChartView(){
+
+chartScale=1;
+chartOffset=0;
+drawChart();
+
+}
+
+function centerChart(){
+
+chartOffset=0;
+drawChart();
+
+}
+
+function chartZoom(factor){
+
+chartScale*=factor;
+
+chartScale=Math.max(
+.45,
+Math.min(
+3,
+chartScale
+)
+);
+
+drawChart();
+
+}
+
+function drawChart(){
+
+const canvas=$('chart');
+
+if(!canvas)
+return;
+
+const wrap=$('chartWrap');
+
+const rect=
+wrap.getBoundingClientRect();
+
+const w=Math.floor(rect.width);
+const h=Math.floor(rect.height);
+
+if(w<10||h<10)
+return;
+
+const ratio=window.devicePixelRatio||1;
+
+canvas.width=Math.floor(w*ratio);
+canvas.height=Math.floor(h*ratio);
+
+const ctx=canvas.getContext('2d');
+
+if(!ctx)return;
+
+ctx.setTransform(
+ratio,
+0,
+0,
+ratio,
+0,
+0
+);
+
+ctx.clearRect(0,0,w,h);
+
+/* grid */
+
+ctx.strokeStyle='#25364b';
+ctx.lineWidth=1;
+
+for(let i=1;i<7;i++){
+
+const y=h*i/7;
+
+ctx.beginPath();
+ctx.moveTo(0,y);
+ctx.lineTo(w,y);
+ctx.stroke();
+
+}
+
+for(let i=1;i<10;i++){
+
+const x=w*i/10;
+
+ctx.beginPath();
+ctx.moveTo(x,0);
+ctx.lineTo(x,h);
+ctx.stroke();
+
+}
+
+/* candles */
+
+const all=
+Array.isArray(candlesByTF[tf])
+?
+candlesByTF[tf]
+:
+[];
+
+if(!all.length){
+
+ctx.fillStyle='#71869e';
+ctx.font='12px Arial';
+
+ctx.fillText(
+'بانتظار شموع MT5...',
+20,
+30
+);
+
+return;
+
+}
+
+const visibleCount=
+Math.max(
+15,
+Math.min(
+140,
+Math.round(70/chartScale)
+)
+);
+
+let end=
+all.length+
+Math.round(chartOffset);
+
+end=Math.max(
+visibleCount,
+Math.min(
+all.length,
+end
+)
+);
+
+let start=end-visibleCount;
+
+start=Math.max(0,start);
+
+const source=
+all.slice(start,end);
+
+if(!source.length)
+return;
+
+let min=
+Math.min(
+...source.map(x=>Number(x.low))
+);
+
+let max=
+Math.max(
+...source.map(x=>Number(x.high))
+);
+
+if(Number.isFinite(price)){
+
+min=Math.min(min,price);
+max=Math.max(max,price);
+
+}
+
+const range=max-min||1;
+const pad=Math.max(range*.08,.5);
+
+min-=pad;
+max+=pad;
+
+function toY(v){
+
+return h-
+(
+(v-min)/
+(max-min)
+)*
+(h-25)-10;
+
+}
+
+const left=10;
+
+const step=
+Math.max(
+3,
+(w-20)/source.length
+);
+
+const bodyW=
+Math.max(
+2,
+step*.58
+);
+
+source.forEach((c,i)=>{
+
+const cx=
+left+i*step+step/2;
+
+const yO=toY(c.open);
+const yC=toY(c.close);
+const yH=toY(c.high);
+const yL=toY(c.low);
+
+const bullish=c.close>=c.open;
+
+ctx.strokeStyle=
+bullish
+?
+'#22c55e'
+:
+'#ef4444';
+
+ctx.fillStyle=
+bullish
+?
+'#22c55e'
+:
+'#ef4444';
+
+ctx.beginPath();
+ctx.moveTo(cx,yH);
+ctx.lineTo(cx,yL);
+ctx.stroke();
+
+ctx.fillRect(
+cx-bodyW/2,
+Math.min(yO,yC),
+bodyW,
+Math.max(1,Math.abs(yC-yO))
+);
+
+});
+
+/* live price */
+
+if(Number.isFinite(price)){
+
+const y=toY(price);
+
+ctx.strokeStyle='#f59e0b';
+
+ctx.setLineDash([4,4]);
+
+ctx.beginPath();
+ctx.moveTo(0,y);
+ctx.lineTo(w,y);
+ctx.stroke();
+
+ctx.setLineDash([]);
+
+ctx.fillStyle='#f59e0b';
+ctx.font='11px Arial';
+
+ctx.fillText(
+Number(price).toFixed(2),
+Math.max(8,w-78),
+Math.max(12,y-5)
+);
+
+}
+
+/* positions */
+
+trades.forEach(t=>{
+
+const entry=Number(t.entry||0);
+
+if(!Number.isFinite(entry)||entry<=0)
+return;
+
+const y=toY(entry);
+
+ctx.strokeStyle=
+t.side==='BUY'
+?
+'#22c55e'
+:
+'#ef4444';
+
+ctx.setLineDash([5,4]);
+
+ctx.beginPath();
+ctx.moveTo(0,y);
+ctx.lineTo(w,y);
+ctx.stroke();
+
+ctx.setLineDash([]);
+
+});
+
+}
+
+function loadSettings(){
+
+const savedConf=
+Number(localStorage.getItem(CONF_STORAGE));
+
+if(
+Number.isFinite(savedConf)&&
+savedConf>=50&&
+savedConf<=99
+)
+$('minConf').value=savedConf;
+
+const savedLot=
+Number(localStorage.getItem(LOT_STORAGE));
+
+if(Number.isFinite(savedLot)&&savedLot>0)
+$('lotSize').value=savedLot;
+
+const savedRisk=
+Number(localStorage.getItem(RISK_STORAGE));
+
+if(Number.isFinite(savedRisk)&&savedRisk>0)
+$('riskPct').value=savedRisk;
+
+const savedMaxTrades=
+Number(localStorage.getItem(MAX_TRADES_STORAGE));
+
+if(Number.isFinite(savedMaxTrades)&&savedMaxTrades>=1)
+$('maxTrades').value=savedMaxTrades;
+
+const savedMaxLoss=
+Number(localStorage.getItem(MAX_LOSS_STORAGE));
+
+if(Number.isFinite(savedMaxLoss)&&savedMaxLoss>0)
+$('maxLoss').value=savedMaxLoss;
+
+updateConfidenceSlider();
+
+$('lotSize').addEventListener(
+'change',
+()=>{
+localStorage.setItem(
+LOT_STORAGE,
+String(Number($('lotSize').value))
+);
+}
+);
+
+$('riskPct').addEventListener(
+'change',
+()=>{
+localStorage.setItem(
+RISK_STORAGE,
+String(Number($('riskPct').value))
+);
+}
+);
+
+$('maxTrades').addEventListener(
+'change',
+()=>{
+localStorage.setItem(
+MAX_TRADES_STORAGE,
+String(Number($('maxTrades').value))
+);
+}
+);
+
+$('maxLoss').addEventListener(
+'change',
+()=>{
+localStorage.setItem(
+MAX_LOSS_STORAGE,
+String(Number($('maxLoss').value))
+);
+}
+);
+
+}
+
+let syncBusy=false;
+
+async function liveMTSync(){
+
+if(syncBusy)
+return;
+
+syncBusy=true;
+
+try{
+
+const connected=await checkBridge();
+
+if(!connected)
+return;
+
+await getLivePrice();
+await syncRealMarketData();
+
+await syncPositions();
+await syncClosedHistory();
+await syncNews();
+
+checkDailyLossLimit();
+
+const d = AI_Analysis();
+
+render(d);
+
+requestAnimationFrame(drawChart);
+
+}catch(error){
+
+console.error('Live Sync:',error);
+
+}finally{
+
+syncBusy=false;
+
+}
+
+}
+
+async function connectRealBridge(){
+
+const ok=await checkBridge();
+
+if(!ok){
+
+showToast(
+'تعذر الاتصال بـ MT5',
+'bad'
+);
+
+return;
+
+}
+
+await liveMTSync();
+
+showToast(
+'تمت مزامنة MT5 بنجاح'
+);
+
+}
+
+/* chart mouse / touch */
+
+const chartWrap=$('chartWrap');
+
+if(chartWrap){
+
+chartWrap.addEventListener(
+'wheel',
+e=>{
+
+e.preventDefault();
+
+chartZoom(
+e.deltaY<0
+?
+1.12
+:
+.89
+);
+
+},
+{passive:false}
+);
+
+chartWrap.addEventListener(
+'mousedown',
+e=>{
+
+chartDragging=true;
+chartDragStartX=e.clientX;
+chartStartOffset=chartOffset;
+
+}
+);
+
+window.addEventListener(
+'mousemove',
+e=>{
+
+if(!chartDragging)
+return;
+
+const dx=e.clientX-chartDragStartX;
+
+chartOffset=
+chartStartOffset-
+Math.round(dx/8);
+
+chartOffset=Math.max(
+-140,
+Math.min(
+140,
+chartOffset
+)
+);
+
+drawChart();
+
+}
+);
+
+window.addEventListener(
+'mouseup',
+()=>{
+
+chartDragging=false;
+
+}
+);
+
+chartWrap.addEventListener(
+'touchstart',
+e=>{
+
+if(!e.touches[0])
+return;
+
+chartDragging=true;
+chartDragStartX=e.touches[0].clientX;
+chartStartOffset=chartOffset;
+
+},
+{passive:true}
+);
+
+chartWrap.addEventListener(
+'touchmove',
+e=>{
+
+if(!chartDragging||!e.touches[0])
+return;
+
+const dx=
+e.touches[0].clientX-chartDragStartX;
+
+chartOffset=
+chartStartOffset-
+Math.round(dx/8);
+
+chartOffset=Math.max(
+-140,
+Math.min(
+140,
+chartOffset
+)
+);
+
+drawChart();
+
+},
+{passive:true}
+);
+
+chartWrap.addEventListener(
+'touchend',
+()=>{
+chartDragging=false;
+}
+);
+
+}
+
+async function startup(){
+
+loadSettings();
+
+renderBlacklist();
+
+drawChart();
+
+console.log(
+'MaherXAI: بدء الاتصال بـ MT5...'
+);
+
+const connected=await checkBridge();
+
+if(connected){
+
+await getLivePrice();
+await syncRealMarketData();
+
+await syncPositions();
+await syncClosedHistory();
+await syncNews();
+
+drawChart();
+
+const d=AI_Analysis();
+
+render(d);
+
+showToast(
+'تم تحميل بيانات MT5'
+);
+
+}else{
+
+console.error(
+'MaherXAI: MT5 CONNECTION FAILED'
+);
+
+}
+
+}
+
+window.mhxSyncTimer=
+setInterval(
+liveMTSync,
+3000
+);
+
+setTimeout(
+liveMTSync,
+700
+);
+
+window.mhxStatusTimer=
+setInterval(
+checkBridge,
+5000
+);
+
+window.addEventListener(
+'resize',
+drawChart
+);
+
+startup();
+
+</script>
+
+</body>
+</html>
